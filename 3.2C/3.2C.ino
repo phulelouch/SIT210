@@ -1,27 +1,28 @@
-int light;
+int lum;
 int photon = A3;
-bool sun;
+int count_seconds;
+int count_hours;
 
 void setup() {
-    
-    Particle.variable("light", light);
+    Particle.variable("lum", lum);
     Particle.variable("photon", photon);
- 
     pinMode(photon,INPUT);
-    sun = false;
-
+    count_seconds = 0;
+    count_hours=1;
 }
-
-void loop() {
-    light = analogRead(photon);
-    if(light > 100 && !sun){ 
-        Particle.publish("IFTTT_light","IFTTT_light",PRIVATE);
-        sun = true;
+void loop(){
+    lum = analogRead(photon);
+    if(lum > 100){
+        Particle.publish("IFTTT", "light", PRIVATE); //test
+        count_seconds += 1; //1s
     }
-    else if(light < 100 && sun) {
-        Particle.publish("IFTTT_shade","IFTTT_shade",PRIVATE);
-        sun = false;
+    else {
+        Particle.publish("IFTTT", "shade", PRIVATE); //
     }
-    delay(30000); //TESTING PURPOSE
-    
+    //time
+    if(count_seconds == 3600*count_hours){ //change to 3600 and it is an hour
+        Particle.publish("exposure", String(count_hours), PRIVATE) ;
+        count_hours++;
+    }
+     delay(1s);
 }
